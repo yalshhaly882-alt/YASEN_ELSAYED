@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة تحكم — Yasoo Portfolio</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050506; --surface:#0e0f13; --surface-2:#15161b; --line:#232429;
+    --text:#f2f2f4; --muted:#8b8d95; --red:#e0263f; --green:#25d366;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--bg); color:var(--text); font-family:'Cairo', sans-serif;
+    padding:24px 16px 80px;
+  }
+  h1{ font-size:22px; margin-bottom:4px; }
+  .sub{ color:var(--muted); font-size:13px; margin-bottom:24px; line-height:1.8; }
+  .sub b{ color:var(--text); }
+  .banner{
+    background:var(--surface); border:1px solid var(--line); border-right:3px solid var(--red);
+    border-radius:10px; padding:14px 16px; font-size:13px; color:var(--muted); line-height:1.9; margin-bottom:26px;
+  }
+  .panel{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:20px; margin-bottom:18px;
+  }
+  .panel h2{ font-size:16px; margin:0 0 14px; display:flex; align-items:center; gap:8px; }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12.5px; color:var(--muted); font-weight:700; margin-bottom:6px; }
+  .field input[type=text], .field textarea{
+    width:100%; background:var(--surface-2); border:1px solid var(--line); color:var(--text);
+    border-radius:8px; padding:10px 12px; font-family:'Cairo', sans-serif; font-size:14px;
+  }
+  .field textarea{ resize:vertical; min-height:60px; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .list-item{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+    padding:14px; margin-bottom:10px; position:relative;
+  }
+  .list-item .rm{
+    position:absolute; top:10px; left:10px; background:none; border:none; color:var(--red);
+    font-size:13px; cursor:pointer; font-weight:700;
+  }
+  .img-preview{
+    width:100%; max-width:220px; border-radius:8px; display:block; margin:8px 0; border:1px solid var(--line);
+  }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:9px;
+    border:1px solid var(--line); background:var(--surface-2); color:var(--text);
+    font-family:'Cairo', sans-serif; font-weight:700; font-size:13.5px; cursor:pointer;
+  }
+  .btn.add{ border-color:var(--red); color:var(--red); }
+  .btn.file{ position:relative; overflow:hidden; }
+  .btn.file input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; }
+  .switch{ position:relative; width:44px; height:24px; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{
+    position:absolute; inset:0; background:var(--line); border-radius:24px; cursor:pointer; transition:.2s;
+  }
+  .slider:before{
+    content:""; position:absolute; width:18px; height:18px; left:3px; top:3px; background:#fff;
+    border-radius:50%; transition:.2s;
+  }
+  .switch input:checked + .slider{ background:var(--red); }
+  .switch input:checked + .slider:before{ transform:translateX(-20px); }
+
+  #stickyBar{
+    position:fixed; bottom:0; right:0; left:0; z-index:50;
+    background:rgba(5,5,6,.92); backdrop-filter:blur(10px); border-top:1px solid var(--line);
+    padding:12px 16px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+  }
+  #stickyBar .btn.primary{ background:var(--red); border-color:var(--red); color:#fff; }
+  #stickyBar .btn.save-local{ background:var(--green); border-color:var(--green); color:#08210f; }
+  #status{ font-size:12px; color:var(--muted); text-align:center; margin-top:6px; width:100%; }
+
+  /* ---------------- LOCK SCREEN ---------------- */
+  #lock{
+    position:fixed; inset:0; z-index:999; background:var(--bg);
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  #lock .box{
+    width:min(340px, 100%); background:var(--surface); border:1px solid var(--line);
+    border-radius:16px; padding:28px 24px; text-align:center;
+  }
+  #lock .lock-ic{ font-size:34px; margin-bottom:10px; }
+  #lock h2{ font-size:17px; margin:0 0 6px; }
+  #lock p{ color:var(--muted); font-size:13px; margin-bottom:18px; }
+  #lock input{
+    width:100%; background:var(--surface-2); border:1px solid var(--line); color:var(--text);
+    border-radius:8px; padding:12px 14px; font-family:'Cairo', sans-serif; font-size:15px;
+    text-align:center; margin-bottom:12px;
+  }
+  #lock button{
+    width:100%; padding:12px; border-radius:9px; border:1px solid var(--red);
+    background:var(--red); color:#fff; font-family:'Cairo', sans-serif; font-weight:800;
+    font-size:14.5px; cursor:pointer;
+  }
+  #lock .err{ color:var(--red); font-size:12.5px; margin-top:10px; min-height:16px; }
+  #appRoot{ display:none; }
+</style>
+</head>
+<body>
+
+  <!-- LOCK SCREEN -->
+  <div id="lock">
+    <div class="box">
+      <div class="lock-ic">🔒</div>
+      <h2>لوحة تحكم خاصة</h2>
+      <p>الصفحة دي ليك انت بس — أدخل كلمة السر عشان تدخل.</p>
+      <input type="password" id="lockPass" placeholder="كلمة السر" autocomplete="off">
+      <button id="lockBtn">دخول</button>
+      <div class="err" id="lockErr"></div>
+    </div>
+  </div>
+
+  <div id="appRoot">
+
+  <h1>🎛️ لوحة تحكم الموقع</h1>
+  <div class="sub">عدّل أي حاجة في الموقع من هنا — الاسم، الصور، النصوص، السوشيال ميديا. مفيش برمجة مطلوبة.</div>
+
+  <div class="banner">
+    ⚠️ <b>مهم تعرفه:</b> الموقع ده صفحة ثابتة (static) مفيهاش سيرفر، فاللوحة دي بتحفظ التعديلات في متصفحك بس (كـ"معاينة") بمجرد ما تضغط "حفظ ومعاينة محلي". عشان التعديلات تظهر لكل الزوار على الإنترنت، لازم في الآخر تضغط <b>"تحميل content.json"</b> وتستبدل بيه الملف القديم في مستودع GitHub بتاعك (أو أي استضافة بتستخدمها).
+  </div>
+
+  <div class="panel">
+    <h2>👤 البيانات الأساسية</h2>
+    <div class="row2">
+      <div class="field"><label>اسم الشعار (الجزء الأول)</label><input type="text" id="logoPre"></div>
+      <div class="field"><label>اسم الشعار (الجزء الملون)</label><input type="text" id="logoAccent"></div>
+    </div>
+    <div class="field"><label>الاسم الكبير في شاشة الترحيب (مثلاً YASOO)</label><input type="text" id="introName"></div>
+    <div class="field"><label>الاسم بالعربي تحت شاشة الترحيب</label><input type="text" id="introSub"></div>
+    <div class="field"><label>عنوان الترحيب الصغير (مثلاً WELCOME TO)</label><input type="text" id="introTag"></div>
+    <div class="field">
+      <label>صورة شاشة الترحيب (خلفية المقدمة)</label>
+      <img id="introImgPreview" class="img-preview">
+      <label class="btn file">📷 غيّر الصورة<input type="file" accept="image/*" data-target="introImage"></label>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>🏠 القسم الرئيسي (Hero)</h2>
+    <div class="field"><label>كلمة صغيرة فوق العنوان (Eyebrow)</label><input type="text" id="heroEyebrow"></div>
+    <div class="row2">
+      <div class="field"><label>بداية العنوان</label><input type="text" id="headlinePre"></div>
+      <div class="field"><label>الاسم الملون في العنوان</label><input type="text" id="headlineAccent"></div>
+    </div>
+    <div class="field"><label>سطر تعريفي تحت العنوان</label><input type="text" id="roleLine"></div>
+    <div class="field">
+      <label>صورتك الشخصية</label>
+      <img id="heroPhotoPreview" class="img-preview">
+      <label class="btn file">📷 غيّر الصورة<input type="file" accept="image/*" data-target="heroPhoto"></label>
+    </div>
+    <div class="row2">
+      <div class="field"><label>الشارة العائمة — العنوان (مثلاً status:)</label><input type="text" id="badgeK"></div>
+      <div class="field"><label>الشارة العائمة — القيمة</label><input type="text" id="badgeV"></div>
+    </div>
+    <div id="tagsList"></div>
+    <button class="btn add" id="addTag">+ إضافة وسم (tag)</button>
+  </div>
+
+  <div class="panel">
+    <h2>ℹ️ نبذة عني (كروت المعلومات)</h2>
+    <div id="aboutList"></div>
+    <button class="btn add" id="addAbout">+ إضافة معلومة جديدة</button>
+  </div>
+
+  <div class="panel">
+    <h2>💬 الاقتباس</h2>
+    <div class="field"><label>النص قبل الكلمة الملونة</label><input type="text" id="quoteBefore"></div>
+    <div class="field"><label>الكلمة/الجملة الملونة</label><input type="text" id="quoteAccent"></div>
+    <div class="field"><label>النص بعدها</label><input type="text" id="quoteAfter"></div>
+    <div class="field"><label>التوقيع</label><input type="text" id="quoteSig"></div>
+  </div>
+
+  <div class="panel">
+    <h2>🏁 الجاليري (عربياتي)</h2>
+    <div id="galleryList"></div>
+    <button class="btn add" id="addGallery">+ إضافة صورة جديدة</button>
+  </div>
+
+  <div class="panel">
+    <h2>🎤 الفنان المفضل</h2>
+    <div class="field">
+      <label>صورة الفنان</label>
+      <img id="artistImgPreview" class="img-preview">
+      <label class="btn file">📷 غيّر الصورة<input type="file" accept="image/*" data-target="artistImg"></label>
+    </div>
+    <div class="field"><label>اسم الفنان</label><input type="text" id="artistName"></div>
+    <div class="field"><label>وصف قصير</label><textarea id="artistText"></textarea></div>
+  </div>
+
+  <div class="panel">
+    <h2>📞 التواصل</h2>
+    <div class="field"><label>نص تعريفي فوق أزرار التواصل</label><textarea id="contactIntro"></textarea></div>
+    <div class="row2">
+      <div class="field"><label>رقم واتساب (بالصيغة الدولية بدون + أو مسافات، مثال: 201271353924)</label><input type="text" id="whatsapp"></div>
+      <div class="field"><label>معرّف / رقم تيليجرام (مثال: elshahaly9 أو +201271353924)</label><input type="text" id="telegram"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>🔗 حسابات السوشيال ميديا</h2>
+    <div class="field"><label>رابط تيك توك</label><input type="text" id="tiktok"></div>
+    <div class="field"><label>رابط فيسبوك</label><input type="text" id="facebook"></div>
+    <div class="field"><label>رابط انستجرام</label><input type="text" id="instagram"></div>
+  </div>
+
+  <div class="panel">
+    <h2>🏷️ شارة المطوّر (Dev Badge)</h2>
+    <div class="toggle-row">
+      <span>إظهار الشارة</span>
+      <label class="switch"><input type="checkbox" id="devEnabled"><span class="slider"></span></label>
+    </div>
+    <div class="row2" style="margin-top:12px;">
+      <div class="field"><label>السطر الأول</label><input type="text" id="devLine1"></div>
+      <div class="field"><label>السطر الثاني</label><input type="text" id="devLine2"></div>
+    </div>
+    <div class="field"><label>رابط الضغط (تيليجرام المطوّر)</label><input type="text" id="devLink"></div>
+  </div>
+
+  <div id="stickyBar">
+    <button class="btn save-local" id="saveLocalBtn">💾 حفظ ومعاينة محلي</button>
+    <button class="btn primary" id="downloadBtn">⬇️ تحميل content.json</button>
+    <label class="btn file">📤 استيراد content.json<input type="file" accept="application/json" id="importInput"></label>
+    <a class="btn" href="index.html" target="_blank">👁️ افتح الموقع</a>
+    <div id="status"></div>
+  </div>
+
+  </div><!-- /#appRoot -->
+
+<script>
+  // -------- Simple client-side password gate --------
+  // This only deters casual visitors — it is NOT real security, since
+  // anyone could read this password out of the page's source code.
+  // To change the password, edit the line below (ADMIN_PASSWORD).
+  const ADMIN_PASSWORD = "yasoo2026";
+
+  const lock = document.getElementById('lock');
+  const appRoot = document.getElementById('appRoot');
+  const lockErr = document.getElementById('lockErr');
+  const lockPass = document.getElementById('lockPass');
+
+  function unlock(){
+    lock.style.display = 'none';
+    appRoot.style.display = 'block';
+    sessionStorage.setItem('yasoo_admin_unlocked', '1');
+  }
+
+  if(sessionStorage.getItem('yasoo_admin_unlocked') === '1'){
+    unlock();
+  }
+
+  document.getElementById('lockBtn').addEventListener('click', tryUnlock);
+  lockPass.addEventListener('keydown', e=>{ if(e.key === 'Enter') tryUnlock(); });
+
+  function tryUnlock(){
+    if(lockPass.value === ADMIN_PASSWORD){
+      unlock();
+    } else {
+      lockErr.textContent = 'كلمة السر غلط، جرب تاني.';
+      lockPass.value = '';
+      lockPass.focus();
+    }
+  }
+</script>
+<script src="admin.js"></script>
+</body>
+</html>
